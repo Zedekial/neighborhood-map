@@ -1,28 +1,80 @@
-.App {
+#app-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+}
+
+#hamburger-icon {
+  position:absolute;
+  left: 260px;
+  top: 10px;
+  z-index: 99999;
+}
+
+#hamburger-button {
+  padding: 5px 10px 5px 10px;
+  z-index: 99999;
+}
+
+#sidebar {
+  height: calc(100vh - 20px);
+  width: 280px;
+  border: 4px solid grey;
+  position: left;
+  padding: 10px;
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.sidebar-hidden {
+  position: fixed;
+  left: -350px;
+  z-index: 99999;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.hamburger-hidden {
+  left: 360px !important;
+  z-index: 99999;
 }
 
-.App-title {
-  font-size: 1.5em;
+#show-hide {
+  position: absolute;
+  z-index: 9999;
+  left: 50%;
 }
 
-.App-intro {
-  font-size: large;
+#map-container {
+  height: 100vh;
+  width: 80%;
+  border: 4px solid green;
+  position: right;
+  display: flex;
+  z-index: 700;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+#map-wrap{
+  display: flex;
+  flex: auto;
+  z-index: 700;
+}
+
+#map {
+  flex: auto;
+  height: auto;
+  z-index: 700;
+}
+
+.map-container-full {
+  width: 100% !important;
+}
+
+#locations-list {
+  list-style-type: none;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+#locations-list *:hover {
+  color: blue;
+  cursor: pointer;
 }
