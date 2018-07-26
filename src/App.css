@@ -42,6 +42,21 @@
   left: 50%;
 }
 
+.hide {
+  top: -25px;
+}
+
+.hide-buttons{
+  text-align: center;
+}
+
+#center-map {
+  z-index: 9999;
+  position: absolute;
+  left: 93%;
+  width: 60px;
+}
+
 #map-container {
   height: 100vh;
   width: 80%;
@@ -74,7 +89,16 @@
   padding: 0;
 }
 
-#locations-list *:hover {
+.restaurant-container {
+  border: dotted 3px orange;
+  margin: 2px;
+}
+
+.restaurant-container, list-item *:hover {
   color: blue;
   cursor: pointer;
+}
+
+.gm-style-iw {
+
 }
