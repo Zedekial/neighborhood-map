@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import Map from './Map.js'
 import SideBar from './SideBar.js'
+import Header from './Header.js'
 import * as GoogleMapsAPI from './GoogleMapsAPI.js'
-import * as FoursquareAPI from './FoursquareAPI.js'
 /* Get Map and store in state, this will be displayed by the map component.  */
 
 class App extends Component {
@@ -29,6 +29,7 @@ class App extends Component {
   this.GetMap=this.GetMap.bind(this)
   this.HighlightPin=this.HighlightPin.bind(this)
   this.HandleInfoWindow=this.HandleInfoWindow.bind(this)
+  this.InfoWindowX=this.InfoWindowX.bind(this)
   this.FilterLocations=this.FilterLocations.bind(this)
   this.FurtherInfo=this.FurtherInfo.bind(this)
   this.CenterMap=this.CenterMap.bind(this)
@@ -49,8 +50,13 @@ class App extends Component {
         previousMarker: this.state.currentMarker,
       })
       setTimeout(()=> {
+        let markerCopy = {...this.state.previousMarker}
+
         this.state.previousInfoWindow.close()
-        this.state.previousMarker.infowindow = false
+        markerCopy.infowindow = false
+        this.setState({
+          previousMarker: markerCopy,
+        })
       },50)
     }
   }
@@ -67,24 +73,22 @@ class App extends Component {
         filter: e.target.value,
       })
 
-    this.state.locations.map((location) => {
-      console.log(location)
+    this.state.locations.forEach((location) => {
       let thisLocation = location.name.toUpperCase()
       let thisCategory = location.categories[0].name.toUpperCase()
       let filter = this.state.filter.toUpperCase()
       if(!thisLocation.includes(filter)) {
         if(!thisCategory.includes(filter)) {
         location.show = false
-        this.state.markers.map((marker) => {
+        this.state.markers.forEach((marker) => {
           if(marker.placeId === location.id && location.show === false) {
-            console.log('Marker and Location ID match for ' + marker.name + ' ' + location.name)
             marker.setMap(null)
           }
         })
       }
       }else {
         location.show = true
-        this.state.markers.map((marker) => {
+        this.state.markers.forEach((marker) => {
           marker.setMap(this.state.map)
           })
         }
@@ -107,20 +111,27 @@ class App extends Component {
         currentMarker: newMarker,
       })
       setTimeout(()=> {
+        let markerCopy = this.state.previousMarker
+
+        markerCopy.infowindow = false
+
+        this.setState({ previousMarker: markerCopy })
         this.state.previousInfoWindow.close()
-        this.state.previousMarker.infowindow = false
       },50)
-      }
+    }
+}
+
+  InfoWindowX () {
+    let currentMarkerCopy = this.state.currentMarker
+    currentMarkerCopy.infowindow = false
+    this.setState({ currentMarker: currentMarkerCopy })
   }
 
   HighlightPin (e) {
-    this.state.markers.map(marker => {
+    this.state.markers.forEach(marker => {
       if(e.target.id === marker.name) {
-        marker.setLabel('!')
         GoogleMapsAPI.createInfoWindow(this.state.map, marker, this.state, this.HandleInfoWindow)
-      }else(
-        marker.setLabel(null)
-      )
+      }
     })
   }
 
@@ -142,10 +153,12 @@ class App extends Component {
 
   HideSideBar () {
     let sideBar = document.getElementById('sidebar')
+    let sidebarInner = document.getElementById('sidebar-inner')
     let hamburger = document.getElementById('hamburger-icon')
     let hamburgerBtn = document.getElementById('hamburger-button')
     let mapcontainer = document.getElementById('map-container')
 
+    sidebarInner.classList.toggle('sidebar-inner-hidden')
     sideBar.classList.toggle('sidebar-hidden')
     hamburger.classList.toggle('hamburger-hidden')
     mapcontainer.classList.toggle('map-container-full')
@@ -158,23 +171,24 @@ class App extends Component {
   }
 
   FurtherInfo (e) {
-    console.log('working' + ' ' + e.target.id)
     let buttonContent = document.getElementById(e.target.id)
+    let restaurantContainer = e.target.closest('div')
 
-    this.state.locations.map(location => {
-      if(e.target.value === location.name) {
-        if(location.info === true) {
-          console.log('a match, ' + location.info + ' will change to ' + false)
-          location.info = false
-          buttonContent.innerHTML = '+'
-          console.log('true is now ' + location.info)
-        }else if(location.info === false) {
-          console.log('a match, ' + location.info + ' will change to ' + true)
-          location.info = true
-          buttonContent.innerHTML = '-'
-          console.log('false is now ' + location.info)
+    restaurantContainer.classList.toggle('restaurant-selected')
+
+    this.setState({
+      locations: this.state.locations.map(location => {
+        if(e.target.value === location.name) {
+          if(location.info === true) {
+            location.info = false
+            buttonContent.innerHTML = '→'
+          }else if(location.info === false) {
+            location.info = true
+            buttonContent.innerHTML = '↑'
+          }
         }
-      }
+        return location
+      })
     })
   }
 
@@ -182,17 +196,25 @@ class App extends Component {
     this.setState({
       mapLoading: true,
     })
-    fetch('https://api.foursquare.com/v2/venues/explore?ll=52.362884,4.863844&query=food&v=20180323&limit=20&intent=browse&radius=700&client_id=ZG1TWXPHE4V2ZEN0JK1GOGOA3NKLN2JQGPNJSN14AVYICL1X&client_secret=GGYHPT4BTUIBCWUZISGPS5JFAXUZHBYKTMVWK2AZAWPTAHCX')
+    fetch('https://api.foursquare.com/v2/venues/explore?ll=52.362884,4.863844&query=food&v=20180323&limit=20&intent=browse&radius=700&client_id=ZG1TWXPHE4V2ZEN0JK1GOGOA3NKLN2JQGPNJSN14AVYICL1X&client_secret=GGYHPT4BTUIBCWUZISGPS5JFAXUZHBYKTMVWK2AZAWPTAHCX&X-RateLimit-Remaining')
       .then(res => res.json())
       .then(data => data.response.groups[0].items)
       .then((newLocations) => {
         let venuesArray = []
-        // GoogleMapsAPI.getPhotos(newLocations) /* This isn't right */
-        newLocations.map(location =>{
+        newLocations.forEach(location =>{
           let newLocation = location.venue
           newLocation.show = true
           newLocation.info = false
-          venuesArray.push(newLocation)
+          // fetch('https://api.foursquare.com/v2/venues/' + newLocation.id + '?client_id=ZG1TWXPHE4V2ZEN0JK1GOGOA3NKLN2JQGPNJSN14AVYICL1X&client_secret=GGYHPT4BTUIBCWUZISGPS5JFAXUZHBYKTMVWK2AZAWPTAHCX&v=20180728')
+          //   .then(res => res.json())
+          //   .then(data => { console.log(data)
+          //     // if(data.response.venue.url === true) {
+          //     //   newLocation.url = data.response.venue.url
+          //     // }else {
+          //     //   newLocation.url = ''
+          //     // }
+          //   })
+            venuesArray.push(newLocation)
         })
         this.setState({
           locations: venuesArray
@@ -200,17 +222,21 @@ class App extends Component {
       })
       .then(
         setTimeout(() => {
-          GoogleMapsAPI.LoadMap(this.state, this.AddPinsToArray, this.GetMap, this.HandleInfoWindow)
+          GoogleMapsAPI.LoadMap(this.state, this.AddPinsToArray, this.GetMap, this.HandleInfoWindow, this.InfoWindowX)
           this.setState({
             mapLoading: false,
           })
         },500)
       )
+      setTimeout(() => {
+        console.log(this.state)
+      },1000)
   }
 
   render() {
     return (
-      <div id='app-container'>
+      <div key='app-container' id='app-container'>
+        <Header />
         <SideBar
           hideBar={this.HideSideBar}
           hightlightPin={this.HighlightPin}

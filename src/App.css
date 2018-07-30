@@ -2,12 +2,38 @@
   height: 100vh;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+button {
+  background-color: #ffb4b5;
+  border: solid 1px black;
+  border-radius: 10px;
+  color: #333333;
+}
+
+#header-banner {
+  font-family: verdana;
+  border: 3px black groove;
+  border-radius: 0 50px 0 0 ;
+  background-color: #ffa64d;
+  width: 100%;
+  height: auto;
+  z-index: 99999;
+  color: #333333;
+}
+
+#header-inner {
+  margin: 0;
+  height: auto;
+}
+
+#header-font {
+  text-align: center;
 }
 
 #hamburger-icon {
-  position:absolute;
-  left: 260px;
-  top: 10px;
   z-index: 99999;
 }
 
@@ -16,24 +42,108 @@
   z-index: 99999;
 }
 
+.hamburger-hidden {
+  position: absolute;
+  left: 510px !important;
+  top: 100px;
+  z-index: 99999;
+}
+
 #sidebar {
-  height: calc(100vh - 20px);
-  width: 280px;
-  border: 4px solid grey;
+  border: 4px solid #4ea5ff;
+  background-color: #9accff;
   position: left;
   padding: 10px;
   text-align: center;
+  width: 20%;
+  height: 90%;
+  overflow: hidden;
+}
+
+#sidebar-inner {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding-right: 25px;
+  padding-left: 10px;
+  box-sizing: content-box;
+}
+
+.sidebar-filter, .sidebar-nearby {
+  border-style: inset;
+  border-radius: 5px;
+  box-shadow: 2px 2px grey;
+  margin-bottom: 20px;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  font-family: verdana;
+  color: #333333;
+}
+
+.sidebar-filter {
+  background-color: #e7f3ff;
+  border-color: #81c3ff;
+}
+
+#search-field {
+  background: #f4fff8;
+  width: 80%;
+  height: 20px;
+}
+
+.sidebar-nearby {
+  background-color: #ffd8b4;
+}
+
+.sidebar-headings > h2 {
+  padding: 10px;
+  margin: 0;
 }
 
 .sidebar-hidden {
   position: fixed;
-  left: -350px;
+  left: -500px;
   z-index: 99999;
 }
 
-.hamburger-hidden {
-  left: 360px !important;
-  z-index: 99999;
+.sidebar-inner-hidden {
+
+}
+
+#locations-list {
+  list-style-type: none;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.restaurant-container {
+  border: dashed 3px orange;
+  border-radius: 0 30px 0 0;
+  background-color: #ffffcd;
+  margin: 10px;
+  padding: 10px 0 10px 0;
+}
+
+.restaurant-container, list-item *:hover {
+  color: grey;
+  cursor: pointer;
+}
+
+.list-item {
+  margin: 10px;
+}
+
+.restaurant-selected {
+  border: solid 4px orange;
+  background-color: #ffffb4;
+}
+
+.info-button {
+  margin-left: 30px;
+}
+
+.button-span {
 }
 
 #show-hide {
@@ -43,7 +153,7 @@
 }
 
 .hide {
-  top: -25px;
+  top: 60px;
 }
 
 .hide-buttons{
@@ -58,12 +168,11 @@
 }
 
 #map-container {
-  height: 100vh;
-  width: 80%;
   border: 4px solid green;
   position: right;
   display: flex;
   z-index: 700;
+  flex: 3;
 }
 
 #map-wrap{
@@ -80,25 +189,8 @@
 
 .map-container-full {
   width: 100% !important;
+  height: 100%;
 }
 
-#locations-list {
-  list-style-type: none;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-
-.restaurant-container {
-  border: dotted 3px orange;
-  margin: 2px;
-}
-
-.restaurant-container, list-item *:hover {
-  color: blue;
-  cursor: pointer;
-}
-
-.gm-style-iw {
-
+.infowindow-styler {
 }

@@ -4,7 +4,7 @@ import ReactDOMServer from 'react-dom/server'
 /* global google */
 const key = 'AIzaSyDbLLEvUq8BW8O6UDAP4jlDAHnJ3jNC6do'
 
-export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow) => {
+export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWindowX) => {
   window.initMap = initMap;
 
   loadJS('https://maps.googleapis.com/maps/api/js?key=' + key + '&callback=initMap')
@@ -39,7 +39,10 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow) => {
 
     let bounds = new google.maps.LatLngBounds()
 
-    props.locations.map(location => {
+    const defaultIcon = makeMarkerIcon('0091ff')
+    const highlightedIcon = makeMarkerIcon('ffa64d')
+
+    props.locations.forEach(location => {
       let lat = parseFloat(location.location.lat)
       let lng = parseFloat(location.location.lng)
 
@@ -52,12 +55,20 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow) => {
         animation: google.maps.Animation.DROP,
         infowindow: false,
         categories: location.categories[0].name,
+        icon: defaultIcon,
       })
 
       bounds.extend({lat, lng})
 
+      marker.addListener('mouseover', function() {
+        this.setIcon(highlightedIcon);
+      })
+      marker.addListener('mouseout', function() {
+        this.setIcon(defaultIcon);
+      })
+
       marker.addListener('click', () =>
-        createInfoWindow(map, marker, props, HandleInfoWindow)
+        createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindowX)
       )
 
       marker.addListener('click', () => {
@@ -71,13 +82,27 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow) => {
       markersArray.push(marker)
     })
     AddPinsToArray(markersArray)
+
+
+
+    function makeMarkerIcon (markerColor) {
+      var markerImage = new google.maps.MarkerImage(
+        'http://chart.googleapis.com/chart?chst=d_map_pin_icon&chld=restaurant|'+ markerColor +
+        '|40|_|%E2%80%A2',
+        new google.maps.Size(24, 35),
+        new google.maps.Point(0, 0),
+        new google.maps.Point(0, 0),
+        new google.maps.Size(24,35));
+        return markerImage;
+      }
   }
+
 }
 
 
 /*  Fix this function. Not finished. */
 export function getPhotos (locations) {
-  locations.map(location => {
+  locations.forEach(location => {
     let photoUrl = ''
     let lat = location.venue.location.lat
     let lng = location.venue.location.lng
@@ -89,10 +114,10 @@ export function getPhotos (locations) {
   })
 }
 
-export function createInfoWindow(map, marker, props, HandleInfoWindow) {
+export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindowX) {
   function InfoWindowContent() {
     return(
-      <div>
+      <div id='infowindow-content'>
         <h3>Name: {marker.name}</h3>
         <div>
           <h4>Address: </h4>
@@ -121,8 +146,14 @@ export function createInfoWindow(map, marker, props, HandleInfoWindow) {
     })
     HandleInfoWindow(infowindow, marker)
     infowindow.open(map, marker)
-    marker.infowindow = true
+    setTimeout(() => {
+      let infowindowParent = document.querySelector('.gm-style-iw')
+      infowindowParent.parentNode.classList.toggle('infowindow-styler')
 
+      let infoX = infowindowParent.nextSibling
+      infoX.addEventListener('click', () => InfoWindowX())
+    },100)
+    marker.infowindow = true
     map.addListener('click', () => {
       infowindow.close()
       marker.infowindow = false
