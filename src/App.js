@@ -6,6 +6,8 @@ import Header from './Header.js'
 import * as GoogleMapsAPI from './GoogleMapsAPI.js'
 /* Get Map and store in state, this will be displayed by the map component.  */
 
+window.gm_authFailure = () => { alert("I'm sorry, the map had an error while loading! Please refresh and try again");}
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -22,6 +24,28 @@ class App extends Component {
       previousMarker:'',
       filter: '',
       mapLoading: false,
+      imgUrls: {
+        'Addis_Ababa': 'https://image.ibb.co/hVN3b8/Addis_Ababa.jpg',
+        'Bagels_and_Beans': 'https://image.ibb.co/fTgww8/Bagels_Beans.jpg',
+        'Barrica': 'https://image.ibb.co/nRtWUT/Barrica.jpg',
+        'Biladi': 'https://image.ibb.co/cmJWUT/Biladi.jpg',
+        'cafe_Comodo': 'https://image.ibb.co/m3d9G8/cafe_C_modo.jpg',
+        'Cafe_Lennep': 'https://image.ibb.co/e8H3b8/Cafe_Lennep.jpg',
+        'Cafe_Panache': 'https://image.ibb.co/khc3b8/Cafe_Panache.jpg',
+        'Coffee_Plaza': 'https://image.ibb.co/gXtn3o/Coffee_Plaza.jpg',
+        'Dikke_Graaf': 'https://image.ibb.co/gOKuio/Dikke_Graaf.jpg',
+        'Donerland_Eethuis': 'https://image.ibb.co/bH4uio/D_nerland_Eethuis.jpg',
+        'Doppio_Espresso': 'https://image.ibb.co/ceRUG8/Doppio_Espresso.jpg',
+        'Fenan_Klein_Afrika': 'https://image.ibb.co/gmfd9T/Fenan_Klein_Afrika.jpg',
+        'Frankies_Corner': 'https://image.ibb.co/nLx3b8/Frankies_Corner.jpg',
+        'Lalibela': 'https://image.ibb.co/d6wJ9T/Lalibela.jpg',
+        'Lokaal_Edel': 'https://image.ibb.co/nO2Eio/Lokaal_Edel.jpg',
+        'Meneer_de_Wit_Heeft_Honger': 'https://image.ibb.co/foZib8/Meneer_de_Wit_Heeft_Honger.jpg',
+        'Saffraan': 'https://image.ibb.co/kVcfOo/Saffraan.jpg',
+        'Staring_at_Jacob': 'https://image.ibb.co/iKDbw8/Staring_at_Jacob.jpg',
+        't_Saoto_Huisje': 'https://image.ibb.co/n5NVOo/t_Saoto_Huisje.jpg',
+        'Vegan_Junk_Food_Bar': 'https://image.ibb.co/dxmqOo/Vegan_Junk_Food_Bar.jpg',
+      }
     }
   this.AddPinsToArray = this.AddPinsToArray.bind(this)
   this.ShowPins=this.ShowPins.bind(this)
@@ -76,13 +100,14 @@ class App extends Component {
     this.state.locations.forEach((location) => {
       let thisLocation = location.name.toUpperCase()
       let thisCategory = location.categories[0].name.toUpperCase()
-      let filter = this.state.filter.toUpperCase()
-      if(!thisLocation.includes(filter)) {
-        if(!thisCategory.includes(filter)) {
+      // let filter = this.state.filter.toUpperCase()
+      if(!thisLocation.includes(this.state.filter.toUpperCase())) {
+        if(!thisCategory.includes(this.state.filter.toUpperCase())) {
         location.show = false
         this.state.markers.forEach((marker) => {
-          if(marker.placeId === location.id && location.show === false) {
+          if(marker.placeId === location.id) {
             marker.setMap(null)
+            // console.log(`hiding ${marker.name} with ${marker.placeId}`)
           }
         })
       }
@@ -197,24 +222,27 @@ class App extends Component {
       mapLoading: true,
     })
     fetch('https://api.foursquare.com/v2/venues/explore?ll=52.362884,4.863844&query=food&v=20180323&limit=20&intent=browse&radius=700&client_id=ZG1TWXPHE4V2ZEN0JK1GOGOA3NKLN2JQGPNJSN14AVYICL1X&client_secret=GGYHPT4BTUIBCWUZISGPS5JFAXUZHBYKTMVWK2AZAWPTAHCX&X-RateLimit-Remaining')
-      .then(res => res.json())
+      .then(res => {
+        if(res.ok) {
+          return res.json()
+        }else {
+          return Promise.reject(' - The data was not successfully loaded from the api call')
+        }
+      })
       .then(data => data.response.groups[0].items)
+      .catch(err => {
+        alert(`Sorry there has been an error loading the locations! details of this error are ${err}`)
+        console.log(`Error loading data, error is ${err}`)
+      })
       .then((newLocations) => {
         let venuesArray = []
         newLocations.forEach(location =>{
           let newLocation = location.venue
+          let tidyName = newLocation.name.split(' ').join('_').replace(/ö|ó/g, 'o').replace('\'', '').replace('&', 'and')
           newLocation.show = true
           newLocation.info = false
-          // fetch('https://api.foursquare.com/v2/venues/' + newLocation.id + '?client_id=ZG1TWXPHE4V2ZEN0JK1GOGOA3NKLN2JQGPNJSN14AVYICL1X&client_secret=GGYHPT4BTUIBCWUZISGPS5JFAXUZHBYKTMVWK2AZAWPTAHCX&v=20180728')
-          //   .then(res => res.json())
-          //   .then(data => { console.log(data)
-          //     // if(data.response.venue.url === true) {
-          //     //   newLocation.url = data.response.venue.url
-          //     // }else {
-          //     //   newLocation.url = ''
-          //     // }
-          //   })
-            venuesArray.push(newLocation)
+          newLocation.imgUrl = this.state.imgUrls[`${tidyName}`]
+          venuesArray.push(newLocation)
         })
         this.setState({
           locations: venuesArray
@@ -228,9 +256,7 @@ class App extends Component {
           })
         },500)
       )
-      setTimeout(() => {
-        console.log(this.state)
-      },1000)
+      .catch(e => console.log(e))
   }
 
   render() {

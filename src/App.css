@@ -34,19 +34,18 @@ button {
 }
 
 #hamburger-icon {
-  z-index: 99999;
+  z-index: 9999;
 }
 
 #hamburger-button {
   padding: 5px 10px 5px 10px;
-  z-index: 99999;
+  z-index: 9999;
 }
 
 .hamburger-hidden {
   position: absolute;
   left: 510px !important;
   top: 100px;
-  z-index: 99999;
 }
 
 #sidebar {
@@ -61,12 +60,17 @@ button {
 }
 
 #sidebar-inner {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow-y: scroll;
   padding-right: 25px;
   padding-left: 10px;
   box-sizing: content-box;
+  z-index: 9999;
+}
+
+.sidebar-inner-hidden {
 }
 
 .sidebar-filter, .sidebar-nearby {
@@ -103,11 +107,7 @@ button {
 .sidebar-hidden {
   position: fixed;
   left: -500px;
-  z-index: 99999;
-}
-
-.sidebar-inner-hidden {
-
+  z-index: 9999;
 }
 
 #locations-list {
@@ -125,8 +125,8 @@ button {
   padding: 10px 0 10px 0;
 }
 
-.restaurant-container, list-item *:hover {
-  color: grey;
+.list-item:hover {
+  color: red;
   cursor: pointer;
 }
 
@@ -143,6 +143,11 @@ button {
   margin-left: 30px;
 }
 
+.info-button:hover {
+  cursor: help;
+  background-color: orange;
+}
+
 .button-span {
 }
 
@@ -150,14 +155,21 @@ button {
   position: absolute;
   z-index: 9999;
   left: 50%;
+  align-items: center;
+}
+
+#show-hide-button:hover {
+  cursor: crosshair;
+  background-color: orange;
 }
 
 .hide {
   top: 60px;
 }
 
-.hide-buttons{
-  text-align: center;
+#hide-buttons:hover {
+  cursor: crosshair;
+  background-color: orange;
 }
 
 #center-map {
@@ -165,6 +177,11 @@ button {
   position: absolute;
   left: 93%;
   width: 60px;
+}
+
+#center-map:hover {
+  cursor: move;
+  background-color: orange;
 }
 
 #map-container {
@@ -192,5 +209,29 @@ button {
   height: 100%;
 }
 
+.gm-style-iw {
+}
+
 .infowindow-styler {
+}
+
+.infowindow-content {
+  display: flex;
+  margin-left: 10px;
+}
+
+.inner-infowindow {
+}
+
+#img-container {
+  width: auto;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#restaurant-img {
+  flex: auto;
+  max-width: 200px;
+  width: auto;
+  height: auto;
 }

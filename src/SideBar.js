@@ -35,7 +35,7 @@ function PlaceItem (props, hightlightPin, furtherInfo) {
   let buttonName = props.name.split(' ').join('-') + '-button'
     return (
       <div className='restaurant-container'>
-        <span className='button-span'><button id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
+        <span className='button-span'><button className='info-button' id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
         <li id={props.name}key={props.name} className='list-item' onClick={e => hightlightPin(e)}>{props.name}</li>
           <DisplayInfo
           props={props}
@@ -57,13 +57,13 @@ function ListPlaces (props) {
 
 const SideBar = (props) => (
   <div id='sidebar' key={props.index}>
+    <Hamburger
+    hideBar={props.hideBar}
+    />
     <div id='sidebar-inner' key={props.index}>
-      <Hamburger
-      hideBar={props.hideBar}
-      />
       <div className='sidebar-filter'>
         <h2>Filter:</h2>
-        <input id='search-field' onKeyUp={props.filterLocations} />
+        <input id='search-field' onChange={props.filterLocations} />
       </div>
       <div className='sidebar-nearby'>
         <h2>Nearby:</h2>

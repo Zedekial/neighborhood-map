@@ -56,6 +56,7 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
         infowindow: false,
         categories: location.categories[0].name,
         icon: defaultIcon,
+        imgUrl: location.imgUrl,
       })
 
       bounds.extend({lat, lng})
@@ -67,9 +68,9 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
         this.setIcon(defaultIcon);
       })
 
-      marker.addListener('click', () =>
+      marker.addListener('click', () => {
         createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindowX)
-      )
+      })
 
       marker.addListener('click', () => {
         marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -118,23 +119,31 @@ export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindo
   function InfoWindowContent() {
     return(
       <div id='infowindow-content'>
-        <h3>Name: {marker.name}</h3>
-        <div>
-          <h4>Address: </h4>
-            <p>{marker.address}</p>
-          <h4>Categories:</h4>
-            <p>{marker.categories}</p>
+        <div id='img-container'>
+          <img id='restaurant-img' src={marker.imgUrl} alt={`${marker.name} restaurant`} />
         </div>
-        <ul>
-          <span><b><u>Hours</u></b></span>
-          <li>Monday: </li>
-          <li>Tuesday: </li>
-          <li>Wednesday: </li>
-          <li>Thursday: </li>
-          <li>Friday: </li>
-          <li>Saturday: </li>
-          <li>Sunday: </li>
-        </ul>
+        <div id='inner-infowindow'>
+          <h3>Name: {marker.name}</h3>
+          <div>
+          {marker.address ?
+            (
+              <div>
+                <h4>Address: </h4>
+                <p>{marker.address},</p>
+                <p>Amsterdam</p>
+              </div>
+            )
+              :
+            (
+              <div>
+                <p><i>No address found</i></p>
+              </div>
+            )
+            }
+            <h4>Category:</h4>
+              <p>{marker.categories}</p>
+          </div>
+        </div>
       </div>
     )
   }
@@ -146,6 +155,7 @@ export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindo
     })
     HandleInfoWindow(infowindow, marker)
     infowindow.open(map, marker)
+    map.setCenter(marker.position)
     setTimeout(() => {
       let infowindowParent = document.querySelector('.gm-style-iw')
       infowindowParent.parentNode.classList.toggle('infowindow-styler')
