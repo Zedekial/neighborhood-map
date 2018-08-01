@@ -40,14 +40,14 @@ This app was also created with accessibility in mind and contains aria labels an
 
 **2**: Download or clone the repo onto your local machine
 
-```
+
 To run on a local machine:
 * `cd` to the neighborhood-map folder
 * run 'npm install' to install relevant dependencies
 * start the development server with 'npm start', this should open a page automatically with the app running, otherwise visit `http://localhost:3000` in your browser
 
 > `create-react-app` does implement a service worker, however this is only live during a production build. If you wish to view the app with a service worker please run `npm run serve` and visit `localhost:5000`.
-```
+
 
 ### Disclaimer
 
@@ -57,4 +57,4 @@ The design of this application is all by the **Author**.
 
 ### Bugs
 
-If you clone, download or run this app and find any bugs, please don't hesitate to let me know. This can be done by commenting the bug on the main `app.js` file and I will squash any bugs found. 
+If you clone, download or run this app and find any bugs, please don't hesitate to let me know. This can be done by commenting the bug on the main `app.js` file and I will squash any bugs found.
