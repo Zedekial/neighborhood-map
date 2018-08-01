@@ -7,7 +7,7 @@ function Hamburger (props) {
   return !props.hideSideBar &&
   (
     <div id='hamburger-icon' className='hamburger-on-sidebar'>
-      <button id='hamburger-button' onClick={props.hideBar}>=< /button>
+      <button id='hamburger-button' onClick={props.hideBar} aria-label='Hide the sidebar'>=< /button>
     </div>
   )
 }
@@ -16,17 +16,17 @@ function Hamburger (props) {
 function DisplayInfo (props) {
     if(props.props.info === true) {
       return (
-        <div>
-          <h4 tabIndex='0'>Address: </h4>
+        <div tabIndex='0'>
+          <h4>Address: </h4>
           <div>
-            <p tabIndex='0'>{props.props.location.formattedAddress.map(address => {
+            <p>{props.props.location.formattedAddress.map(address => {
               return (
                 <li>{address}</li>
               )
             })}</p>
           </div>
-          <h4 tabIndex='0'>Restaurant Type:</h4>
-          <p tabIndex='0'>{props.props.categories[0].name}</p>
+          <h4>Restaurant Type:</h4>
+          <p>{props.props.categories[0].name}</p>
         </div>
       )
     }else {
@@ -41,8 +41,8 @@ function PlaceItem (props, hightlightPin, furtherInfo) {
   let buttonName = props.name.split(' ').join('-') + '-button'
     return (
       <div className='restaurant-container'>
-        <span className='button-span'><button name={`Display further info for ${props.name}`} className='info-button' id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
-        <li name={`highlight the pin and open an infowindow for ${props.name}`} id={props.name} key={props.id} tabIndex='0' className='list-item' onClick={e => hightlightPin(e)} onKeyUp={e => hightlightPin(e)} tabIndex='0'>{props.name}</li>
+        <span className='button-span'><button name={`Display further info for ${props.name}`} aria-label={`Display more information about ${props.name}`} className='info-button' id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
+        <li name={`highlight the pin and open an infowindow for ${props.name}`} id={props.name} key={props.id} className='list-item' onClick={e => hightlightPin(e)} onKeyUp={e => hightlightPin(e)} tabIndex='0'>{props.name}</li>
           <DisplayInfo
           props={props}
           />
@@ -73,10 +73,10 @@ const SideBar = (props) => (
     <div id='sidebar-inner' key={props.index}>
       <div className='sidebar-filter'>
         <h2>Filter:</h2>
-        <input id='search-field' onChange={props.filterLocations} />
+        <input id='search-field' onChange={props.filterLocations} aria-label='Filter restaurants by category or name' />
       </div>
       <div key={props.locations[0]} className='sidebar-nearby'>
-        <h2>Nearby:</h2>
+        <h2 tabIndex='0' aria-label='List of local restaurants'>Nearby:</h2>
         <ul key={props.locations[0]} id='locations-list'>
         <ListPlaces
         locations={props.locations}

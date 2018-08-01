@@ -2,6 +2,7 @@
   "name": "neighborhood-map",
   "version": "0.1.0",
   "private": true,
+  "homepage" : "http://Zedekial.github.io/neighborhood-map",
   "dependencies": {
     "g": "^2.0.1",
     "react": "^16.4.1",

@@ -203,6 +203,7 @@ class App extends Component {
     let restaurantContainer = e.target.closest('div')
 
     restaurantContainer.classList.toggle('restaurant-selected')
+    restaurantContainer.focus()
 
     this.setState({
       locations: this.state.locations.map(location => {
@@ -236,7 +237,7 @@ class App extends Component {
       })
       .then(data => data.response.groups[0].items)
       .catch(err => {
-        alert(`Sorry there has been an error loading the locations! details of this error are ${err}`)
+        alert(`Sorry there has been an error loading the locations! details of this error are ${err} <br> Hint: You might be offline, check your internet connection and try again`)
         console.log(`Error loading data, error is ${err}`)
       })
       .then((newLocations) => {

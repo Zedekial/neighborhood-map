@@ -15,19 +15,19 @@ function Map (props) {
         <div id='map-wrap'>
         {props.hideSideBar &&
           (<div id='hamburger-icon' className='hamburger-on-map'>
-            <button id='hamburger-button' onClick={props.hideBar}>+< /button>
+            <button id='hamburger-button' onClick={props.hideBar} aria-label='show the sidebar'>+< /button>
           </div>)}
           {/* The show hide buttons call a method in the app.js component which will either show or hide all markers */}
           <div id='show-hide'>
-            <button id='show-hide-button' onClick={props.showPins}>Show</button><button id='show-hide-button' onClick={props.hidePins}>Hide</button>
+            <button id='show-hide-button' onClick={props.showPins} tabIndex='-1'>Show</button><button id='show-hide-button' onClick={props.hidePins} tabIndex='-1'>Hide</button>
             <div>
-              <button onClick={showHide} id='hide-buttons'>-</button>
+              <button onClick={showHide} id='hide-buttons' tabIndex='-1'>-</button>
             </div>
           </div>
             <div>
               <button onClick={props.centerMap} id='center-map'>Center Map</button>
             </div>
-          <div id='map'>
+          <div id='map' aria-label='google map picture'>
           </div>
         </div>
       </div>

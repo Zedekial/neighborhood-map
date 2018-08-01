@@ -115,9 +115,9 @@ export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindo
     return(
       <div id='infowindow-content' tabindex='0'>
         <div id='img-container'>
-          <img id='restaurant-img' src={marker.imgUrl} alt={`${marker.name} restaurant`} tabindex='0' />
+          <img id='restaurant-img' src={marker.imgUrl} alt={`Picture of ${marker.name} restaurant`} />
         </div>
-        <div id='inner-infowindow' tabindex='0'>
+        <div id='inner-infowindow'>
           <h3>Name: {marker.name}</h3>
           <div>
           {marker.address ?
