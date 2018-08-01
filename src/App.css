@@ -55,10 +55,6 @@ button {
   margin-top: 10px;
 }
 
-.hamburger-on-sidebar {
-
-}
-
 #sidebar {
   border: 4px solid #4ea5ff;
   background-color: #9accff;
@@ -66,7 +62,7 @@ button {
   padding: 10px;
   text-align: center;
   width: 20%;
-  height: 90%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -175,7 +171,7 @@ button {
 #center-map {
   z-index: 9999;
   position: absolute;
-  left: 93%;
+  right: 1%;
   width: 60px;
   margin-top: 10px;
 }
@@ -210,18 +206,9 @@ button {
   height: 100%;
 }
 
-.gm-style-iw {
-}
-
-.infowindow-styler {
-}
-
 .infowindow-content {
   display: flex;
   margin-left: 10px;
-}
-
-.inner-infowindow {
 }
 
 #img-container {
@@ -235,4 +222,55 @@ button {
   max-width: 200px;
   width: auto;
   height: auto;
+}
+
+@media screen and (max-width: 775px) {
+  #header-banner {
+    border: 0;
+  }
+
+  #header-font {
+    margin: 10px;
+  }
+
+  #sidebar {
+    padding: 0;
+    width: 25%;
+    border: none;
+  }
+  #hamburger-button {
+    margin-top: 10px;
+  }
+
+  #sidebar-inner {
+    padding-left: 0;
+  }
+
+  #map-container {
+    border: none;
+  }
+
+  .sidebar-filter {
+    border: 0!important;
+    border-radius: 0;
+    border-style: none;
+  }
+
+  .sidebar-nearby {
+    border: 0!important;
+    border-radius: 0;
+  }
+
+}
+
+@media screen and (max-width: 625px) {
+  #header-font {
+    font-size: 22px
+  }
+
+  #sidebar {
+    padding: 0;
+    width: 25%;
+    font-size: 70%;
+  }
 }
