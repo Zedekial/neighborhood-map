@@ -35,6 +35,12 @@ button {
 
 #hamburger-icon {
   z-index: 9999;
+  margin-bottom: 10px;
+}
+
+#hamburger-button:hover {
+  background-color: orange;
+  cursor: pointer;
 }
 
 #hamburger-button {
@@ -42,10 +48,15 @@ button {
   z-index: 9999;
 }
 
-.hamburger-hidden {
-  position: absolute;
-  left: 510px !important;
-  top: 100px;
+.hamburger-on-map {
+  z-index: 9999;
+  position:fixed;
+  left: 1%;
+  margin-top: 10px;
+}
+
+.hamburger-on-sidebar {
+
 }
 
 #sidebar {
@@ -68,9 +79,6 @@ button {
   padding-left: 10px;
   box-sizing: content-box;
   z-index: 9999;
-}
-
-.sidebar-inner-hidden {
 }
 
 .sidebar-filter, .sidebar-nearby {
@@ -102,12 +110,6 @@ button {
 .sidebar-headings > h2 {
   padding: 10px;
   margin: 0;
-}
-
-.sidebar-hidden {
-  position: fixed;
-  left: -500px;
-  z-index: 9999;
 }
 
 #locations-list {
@@ -148,8 +150,6 @@ button {
   background-color: orange;
 }
 
-.button-span {
-}
 
 #show-hide {
   position: absolute;
@@ -177,6 +177,7 @@ button {
   position: absolute;
   left: 93%;
   width: 60px;
+  margin-top: 10px;
 }
 
 #center-map:hover {

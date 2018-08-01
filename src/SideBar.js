@@ -1,28 +1,32 @@
 import React from 'react';
-/* This will be the sidebar component, this will contain the list of places which you can click and interact with */
+/* This is the sidebar component, this contains the list of places which can be clicked on to highlight the marker, or a button to pop open more information within the bar.
+Additionally it contains a filter/search input */
 
+/* Just a basic hide/show button. This is conditionally rendered and will either be rendered on the sidebar or on the map directly if the sidebar is hidden */
 function Hamburger (props) {
-  return (
-    <div id='hamburger-icon'>
+  return !props.hideSideBar &&
+  (
+    <div id='hamburger-icon' className='hamburger-on-sidebar'>
       <button id='hamburger-button' onClick={props.hideBar}>=< /button>
     </div>
   )
 }
 
+/* Each list item has a hidden furtherinfo pane which will be displayed upon clicking an arrow button above it. This is conditionally rendered for each list item */
 function DisplayInfo (props) {
     if(props.props.info === true) {
       return (
         <div>
-          <h4>Address: </h4>
+          <h4 tabIndex='0'>Address: </h4>
           <div>
-            <p>{props.props.location.formattedAddress.map(address => {
+            <p tabIndex='0'>{props.props.location.formattedAddress.map(address => {
               return (
                 <li>{address}</li>
               )
             })}</p>
           </div>
-          <h4>Restaurant Type:</h4>
-          <p>{props.props.categories[0].name}</p>
+          <h4 tabIndex='0'>Restaurant Type:</h4>
+          <p tabIndex='0'>{props.props.categories[0].name}</p>
         </div>
       )
     }else {
@@ -31,12 +35,14 @@ function DisplayInfo (props) {
 
 }
 
+/* Each list item is built with a furtherinfo button which will set a boolean for conditional rendering and uses an onclick function which will call a method in the app.js
+component which highlights the matching marker and opens an infowindow on it  */
 function PlaceItem (props, hightlightPin, furtherInfo) {
   let buttonName = props.name.split(' ').join('-') + '-button'
     return (
       <div className='restaurant-container'>
-        <span className='button-span'><button className='info-button' id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
-        <li id={props.name}key={props.name} className='list-item' onClick={e => hightlightPin(e)}>{props.name}</li>
+        <span className='button-span'><button name={`Display further info for ${props.name}`} className='info-button' id={buttonName} value={props.name} onClick={e => furtherInfo(e)}>→</button></span>
+        <li name={`highlight the pin and open an infowindow for ${props.name}`} id={props.name} key={props.id} tabIndex='0' className='list-item' onClick={e => hightlightPin(e)} onKeyUp={e => hightlightPin(e)} tabIndex='0'>{props.name}</li>
           <DisplayInfo
           props={props}
           />
@@ -44,6 +50,8 @@ function PlaceItem (props, hightlightPin, furtherInfo) {
     )
 }
 
+/* Using the locations contained in state, this function will create a list item for each one, passing down needed functions as props. It will also filter based on
+a boolean 'show' which is set during filtering of the list using the searchbar at the top */
 function ListPlaces (props) {
   let hightlightPin = props.hightlightPin
   let furtherInfo = props.furtherInfo
@@ -55,17 +63,19 @@ function ListPlaces (props) {
   )
 }
 
+/* The sidebar contains all locations as list items, a search bar to filter locations by name or category and a hamburger to show/hide the menu */
 const SideBar = (props) => (
   <div id='sidebar' key={props.index}>
     <Hamburger
     hideBar={props.hideBar}
+    hideSideBar={props.hideSideBar}
     />
     <div id='sidebar-inner' key={props.index}>
       <div className='sidebar-filter'>
         <h2>Filter:</h2>
         <input id='search-field' onChange={props.filterLocations} />
       </div>
-      <div className='sidebar-nearby'>
+      <div key={props.locations[0]} className='sidebar-nearby'>
         <h2>Nearby:</h2>
         <ul key={props.locations[0]} id='locations-list'>
         <ListPlaces

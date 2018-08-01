@@ -1,6 +1,7 @@
 import React from 'react';
 /* Map display component. */
 
+/* The map component is mostly just a conatiner for the googlemap, it will also conditionally render the hamburger button if the sidebar is hidden */
 function Map (props) {
   if(props.loading === true) {
     return (
@@ -12,6 +13,11 @@ function Map (props) {
     return (
       <div id='map-container'>
         <div id='map-wrap'>
+        {props.hideSideBar &&
+          (<div id='hamburger-icon' className='hamburger-on-map'>
+            <button id='hamburger-button' onClick={props.hideBar}>+< /button>
+          </div>)}
+          {/* The show hide buttons call a method in the app.js component which will either show or hide all markers */}
           <div id='show-hide'>
             <button id='show-hide-button' onClick={props.showPins}>Show</button><button id='show-hide-button' onClick={props.hidePins}>Hide</button>
             <div>
@@ -28,7 +34,7 @@ function Map (props) {
     )
   }
 }
-
+/* The showhide button will tuck the show/hide buttons under the header and peak out enough to be clicked on again to show them */
 function showHide() {
   let miniMenu = document.getElementById('show-hide')
   let hiddenButtons = document.getElementById('hide-buttons')

@@ -4,16 +4,17 @@ import Map from './Map.js'
 import SideBar from './SideBar.js'
 import Header from './Header.js'
 import * as GoogleMapsAPI from './GoogleMapsAPI.js'
-/* Get Map and store in state, this will be displayed by the map component.  */
 
 window.gm_authFailure = () => { alert("I'm sorry, the map had an error while loading! Please refresh and try again");}
 
+/* The main app component is created as a class and contains the main functions for the overall app. These are passed down to child components for use */
 class App extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      /* The map, pins and other important data will be kept here */
+      /* The map, pins and other important data will be kept here. These are kept here for reference later on, for example the map object is kept here so
+      it can be accessed at anytime by accessing state */
       locations: [],
       markers: [],
       map: {},
@@ -24,6 +25,8 @@ class App extends Component {
       previousMarker:'',
       filter: '',
       mapLoading: false,
+      hideSideBar: false,
+      /* Although Apis such as foursquare and flickr will provide images, these are not satisfactory and so manual images have been saved, uploaded and linked */
       imgUrls: {
         'Addis_Ababa': 'https://image.ibb.co/hVN3b8/Addis_Ababa.jpg',
         'Bagels_and_Beans': 'https://image.ibb.co/fTgww8/Bagels_Beans.jpg',
@@ -47,26 +50,26 @@ class App extends Component {
         'Vegan_Junk_Food_Bar': 'https://image.ibb.co/dxmqOo/Vegan_Junk_Food_Bar.jpg',
       }
     }
-  this.AddPinsToArray = this.AddPinsToArray.bind(this)
-  this.ShowPins=this.ShowPins.bind(this)
-  this.HidePins=this.HidePins.bind(this)
-  this.GetMap=this.GetMap.bind(this)
-  this.HighlightPin=this.HighlightPin.bind(this)
-  this.HandleInfoWindow=this.HandleInfoWindow.bind(this)
-  this.InfoWindowX=this.InfoWindowX.bind(this)
-  this.FilterLocations=this.FilterLocations.bind(this)
-  this.FurtherInfo=this.FurtherInfo.bind(this)
-  this.CenterMap=this.CenterMap.bind(this)
   }
+  /* All methods here are using es6 arrow functions to prevent the need for binding of this on each one from within the app class*/
 
-  GetMap (map, bounds) {
+  /* The map and its bounds are passed from the googlemapsAPI after being created for later reference */
+  GetMap = (map, bounds) => {
     this.setState({
       map: map,
       mapBounds: bounds,
     })
   }
 
-  CenterMap () {
+  /* As well as the map, the pins/markers need to be kept in the array for accessing later */
+  AddPinsToArray = (pins) => {
+    this.setState({
+      markers: pins,
+    })
+  }
+
+  /* This will center the map, move the current infowindow and marker into 'previous' and then close the current infowindow. It acts as a kind of reset. */
+  CenterMap = () => {
     this.state.map.fitBounds(this.state.mapBounds)
     if(this.state.openInfoWindow !== '') {
       this.setState({
@@ -85,7 +88,11 @@ class App extends Component {
     }
   }
 
-  FilterLocations (e) {
+  /* When the search function is used from the sidebar component the search target is passed here, this is then set in the state. Both the markers and locations arrays
+  are then mapped over and those which match the search filter will be shown, those that don't match will be hidden using either a boolean for the locations or setMap(null)
+  for the markers. This is where the map object comes into play for returning markers later */
+  FilterLocations = (e) => {
+    /* If the search term is blank everything will be reset, else the filter will be set */
     if(e.target.value === '') {
       this.setState({
         filter: '',
@@ -97,37 +104,37 @@ class App extends Component {
         filter: e.target.value,
       })
 
+    /* We look through each location in the array to find any matches */
     this.state.locations.forEach((location) => {
+      /* First we set the name of the location and it's category to uppercase for search purposes */
       let thisLocation = location.name.toUpperCase()
       let thisCategory = location.categories[0].name.toUpperCase()
-      // let filter = this.state.filter.toUpperCase()
+
+      /* Then we check if the location does't match, then the category. If neither match the 'show' boolean is set to false, this is checked when displaying locations in the sidebar */
       if(!thisLocation.includes(this.state.filter.toUpperCase())) {
         if(!thisCategory.includes(this.state.filter.toUpperCase())) {
         location.show = false
+        /* Then the markers are checked over and those that match the id of the location will be removed from the map */
         this.state.markers.forEach((marker) => {
           if(marker.placeId === location.id) {
             marker.setMap(null)
-            // console.log(`hiding ${marker.name} with ${marker.placeId}`)
+              }
+            })
           }
-        })
-      }
-      }else {
-        location.show = true
-        this.state.markers.forEach((marker) => {
-          marker.setMap(this.state.map)
-          })
         }
-
       })
     }
   }
 
-  HandleInfoWindow (newInfoWindow, newMarker) {
+  /* This method is to prevent multiple infowindows being opened, it will also set the state with previous and current infowindow/marker */
+  HandleInfoWindow = (newInfoWindow, newMarker) => {
+    /* If this is run for the first time the openInfoWindow will be an empty string so we will set the intial marker and infowindow */
     if(this.state.openInfoWindow === '') {
       this.setState({
         openInfoWindow: newInfoWindow,
         currentMarker: newMarker,
       })
+    /* Otherwise we will move the current marker and infowindow to previous and set the new current marker/infowindow with those passed down to this method  */
     }else {
       this.setState({
         previousInfoWindow: this.state.openInfoWindow,
@@ -135,6 +142,8 @@ class App extends Component {
         previousMarker: this.state.currentMarker,
         currentMarker: newMarker,
       })
+      /* The previous marker needs to have its boolean reset to false to allow it to open an infowindow again, this is done by copying the marker first to prevent
+      mutating state directly */
       setTimeout(()=> {
         let markerCopy = this.state.previousMarker
 
@@ -144,58 +153,52 @@ class App extends Component {
         this.state.previousInfoWindow.close()
       },50)
     }
-}
+  }
 
-  InfoWindowX () {
+  /* Because the methods for handling infowindows and markers are my own we must also handling closing the infowindow by its X button ourselves
+  the infowindow X button is grabbed inside of the createinfowindow function in the googlemapsAPI component and this method is called from there */
+  InfoWindowX = () => {
     let currentMarkerCopy = this.state.currentMarker
     currentMarkerCopy.infowindow = false
     this.setState({ currentMarker: currentMarkerCopy })
   }
 
-  HighlightPin (e) {
+  /* When a location is clicked on from the list we want to bounce the pin and open an infowindow for its corresponding marker. This method is called from the marker location
+  list item in SideBar and then passes through the relevant props to the creatinfowindow function in the googlemaps API */
+  HighlightPin = (e) => {
     this.state.markers.forEach(marker => {
       if(e.target.id === marker.name) {
-        GoogleMapsAPI.createInfoWindow(this.state.map, marker, this.state, this.HandleInfoWindow)
+        GoogleMapsAPI.createInfoWindow(this.state.map, marker, this.state, this.HandleInfoWindow, this.InfoWindowX)
       }
     })
   }
 
-  ShowPins () {
+  /* The next two methods simply show and hide the pins, these are called from the buttons in the map component */
+  ShowPins = () => {
     this.state.markers.forEach(marker => {
       marker.setMap(this.state.map)
     })
   }
 
-  HidePins () {
+  HidePins = () => {
     this.state.markers.forEach(marker => marker.setMap(null))
   }
 
-  AddPinsToArray (pins) {
-    this.setState({
-      markers: pins,
-    })
-  }
 
-  HideSideBar () {
-    let sideBar = document.getElementById('sidebar')
-    let sidebarInner = document.getElementById('sidebar-inner')
-    let hamburger = document.getElementById('hamburger-icon')
-    let hamburgerBtn = document.getElementById('hamburger-button')
+  /* This toggles the state which controls the sidebar being shown or hidden, this is done with conditional rendering. It also sets a class on the mapcontainer to make it full width */
+  HideSideBar = () => {
     let mapcontainer = document.getElementById('map-container')
-
-    sidebarInner.classList.toggle('sidebar-inner-hidden')
-    sideBar.classList.toggle('sidebar-hidden')
-    hamburger.classList.toggle('hamburger-hidden')
     mapcontainer.classList.toggle('map-container-full')
 
-    if(hamburger.classList.contains('hamburger-hidden')) {
-      hamburgerBtn.innerHTML = '+'
-    }else (
-      hamburgerBtn.innerHTML = '='
-    )
+    if(this.state.hideSideBar === true) {
+      this.setState({ hideSideBar: false })
+    }else {
+      this.setState({ hideSideBar: true })
+    }
   }
 
-  FurtherInfo (e) {
+  /* Clicking on the button within each location node in the sidebar will provide more information about it, this is done using conditional rendering */
+  FurtherInfo = (e) => {
     let buttonContent = document.getElementById(e.target.id)
     let restaurantContainer = e.target.closest('div')
 
@@ -217,6 +220,8 @@ class App extends Component {
     })
   }
 
+  /* When the component has mounted the data from the foursquare API is fetched to set the array of locations. First this data is parsed to json and then for each object in the data
+  a location is pushed to a blank array. Once this has finished the array is used to update state */
   componentDidMount () {
     this.setState({
       mapLoading: true,
@@ -237,6 +242,8 @@ class App extends Component {
       .then((newLocations) => {
         let venuesArray = []
         newLocations.forEach(location =>{
+          /* The show, info and imgUrl properties are set for later use on each locations. Additionally the names are tidied up for use in setting the URL, this is
+          because of some names having symbols like & or accented letters in them */
           let newLocation = location.venue
           let tidyName = newLocation.name.split(' ').join('_').replace(/ö|ó/g, 'o').replace('\'', '').replace('&', 'and')
           newLocation.show = true
@@ -248,34 +255,42 @@ class App extends Component {
           locations: venuesArray
         })
       })
-      .then(
-        setTimeout(() => {
+      /* Once we have locations we can call the LoadMap function inside the googlemapsAPI component. This is where async script is loaded to enable the
+      api to work within a React app */
+      .then(() => {
           GoogleMapsAPI.LoadMap(this.state, this.AddPinsToArray, this.GetMap, this.HandleInfoWindow, this.InfoWindowX)
-          this.setState({
-            mapLoading: false,
-          })
-        },500)
-      )
+        })
+      /* Once we have loaded the map we will set the boolean of maploading to false, this displays a simple 'Loading...' message when true */
+      .then(()=> {
+        this.setState({
+          mapLoading: false,
+        })
+      })
       .catch(e => console.log(e))
   }
 
+  /* Render the Header, SideBar and Map components, passing them the state or methods they need as props */
   render() {
     return (
-      <div key='app-container' id='app-container'>
+      <div key={1} id='app-container'>
         <Header />
-        <SideBar
+         {!this.state.hideSideBar &&
+          (<SideBar
           hideBar={this.HideSideBar}
           hightlightPin={this.HighlightPin}
           filterLocations={this.FilterLocations}
           furtherInfo={this.FurtherInfo}
           locations={this.state.locations}
-        />
+          hideSideBar={this.state.hideSideBar}
+          />)}
         <Map
           location={this.state.location}
           loading={this.state.mapLoading}
+          hideSideBar={this.state.hideSideBar}
           hidePins={this.HidePins}
           showPins={this.ShowPins}
           centerMap={this.CenterMap}
+          hideBar={this.HideSideBar}
         />
       </div>
     );

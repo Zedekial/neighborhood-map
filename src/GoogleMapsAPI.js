@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server'
-/* Create the Googlemaps API component which will fetch and return data, this will be exported and accessed by other components */
 /* global google */
 const key = 'AIzaSyDbLLEvUq8BW8O6UDAP4jlDAHnJ3jNC6do'
 
+/* The google maps api works a bit differently with React, to enable everything to work without a framework like google-maps-react (which limits functionality)
+the script/map needs to be loaded asyncronously. Also to keep things tidy anything google maps related, suce as markers and infowindows are dealt with in this component */
 export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWindowX) => {
   window.initMap = initMap;
 
@@ -17,6 +18,7 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
     ref.parentNode.insertBefore(script, ref);
   }
 
+  /* First we build the map, we disable stylers and functionality to keep things simple. Otherwise it's just a webpage containing google maps */
   function initMap () {
     let markersArray = []
 
@@ -42,6 +44,8 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
     const defaultIcon = makeMarkerIcon('0091ff')
     const highlightedIcon = makeMarkerIcon('ffa64d')
 
+    /* Once the map is created the locations array is accessed from state (passed down as props) for each location a marker is created.
+    For the imageUrl it grabs it's url form state */
     props.locations.forEach(location => {
       let lat = parseFloat(location.location.lat)
       let lng = parseFloat(location.location.lng)
@@ -60,6 +64,7 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
       })
 
       bounds.extend({lat, lng})
+      marker.tabindex = 0
 
       marker.addListener('mouseover', function() {
         this.setIcon(highlightedIcon);
@@ -79,9 +84,12 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
         }, 1000)
       })
       map.fitBounds(bounds)
+      /* Once all markers have been created and the bounds has been set, the getmap method is called and passed in the map object and bounds parameters for later use */
       GetMap(map, bounds)
       markersArray.push(marker)
     })
+
+    /* The markers have also been pushed to an array which is passed through to AddPinsToArray, this method sets the state using this array, again for later use */
     AddPinsToArray(markersArray)
 
 
@@ -100,29 +108,16 @@ export const LoadMap = (props, AddPinsToArray, GetMap, HandleInfoWindow, InfoWin
 
 }
 
-
-/*  Fix this function. Not finished. */
-export function getPhotos (locations) {
-  locations.forEach(location => {
-    let photoUrl = ''
-    let lat = location.venue.location.lat
-    let lng = location.venue.location.lng
-    fetch('https://maps.googleapis.com/maps/api/streetview?size=400x400&location=' + lat + ',' + lng + '&fov=90&heading=35&pitch=10&key=' + key)
-    .then(results => {
-      photoUrl = results
-      return photoUrl
-    })
-  })
-}
-
+/* The createinfowindow function is accessed from within multiple components and so is exported. */
 export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindowX) {
+  /* The content must first be created as a function using jsx, then a variable is created using ReactDomServer and renter to string */
   function InfoWindowContent() {
     return(
-      <div id='infowindow-content'>
+      <div id='infowindow-content' tabindex='0'>
         <div id='img-container'>
-          <img id='restaurant-img' src={marker.imgUrl} alt={`${marker.name} restaurant`} />
+          <img id='restaurant-img' src={marker.imgUrl} alt={`${marker.name} restaurant`} tabindex='0' />
         </div>
-        <div id='inner-infowindow'>
+        <div id='inner-infowindow' tabindex='0'>
           <h3>Name: {marker.name}</h3>
           <div>
           {marker.address ?
@@ -157,13 +152,18 @@ export function createInfoWindow(map, marker, props, HandleInfoWindow, InfoWindo
     infowindow.open(map, marker)
     map.setCenter(marker.position)
     setTimeout(() => {
+      /* To use a googlemaps infowindow comfortably I have grabbed the infowindow parent div and then used this to also grab the X button for use */
       let infowindowParent = document.querySelector('.gm-style-iw')
       infowindowParent.parentNode.classList.toggle('infowindow-styler')
+      infowindowParent.focus()
 
+      /* The X button closes the window but doesn't work with other function and booleans which prevent multiple windows and close previous windows. So a separate
+      method is created which is called when pressing the X button */
       let infoX = infowindowParent.nextSibling
       infoX.addEventListener('click', () => InfoWindowX())
     },100)
     marker.infowindow = true
+    /* If the map is clicked, all current infowindows are closed and markers are reset */
     map.addListener('click', () => {
       infowindow.close()
       marker.infowindow = false

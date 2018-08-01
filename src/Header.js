@@ -1,5 +1,6 @@
 import React from 'react'
 
+/* A simple header component for the app */
 function Header () {
   return (
     <div id='header-banner'>
